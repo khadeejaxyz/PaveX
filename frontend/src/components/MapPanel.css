@@ -1,0 +1,202 @@
+/**
+ * MapPanel Component Styles
+ */
+
+.map-panel {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    border-radius: var(--border-radius-xl);
+    overflow: hidden;
+    box-shadow: var(--shadow-lg);
+}
+
+.map-panel__container {
+    width: 100%;
+    height: 100%;
+    background-color: var(--color-neutral-100);
+}
+
+/* Leaflet overrides */
+.map-panel .leaflet-container {
+    font-family: var(--font-sans);
+}
+
+.map-panel .leaflet-popup-content-wrapper {
+    border-radius: var(--border-radius-md);
+    box-shadow: var(--shadow-xl);
+}
+
+.map-panel .leaflet-popup-content {
+    margin: 0;
+    padding: 0;
+}
+
+/* Current Location Marker */
+.map-marker-current__container {
+    position: relative;
+    width: 24px;
+    height: 24px;
+}
+
+.map-marker-current__pulse {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 24px;
+    height: 24px;
+    border-radius: var(--border-radius-full);
+    background-color: var(--color-primary-500);
+    opacity: 0.3;
+    animation: pulse 2s var(--ease-in-out) infinite;
+}
+
+.map-marker-current__dot {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 12px;
+    height: 12px;
+    border-radius: var(--border-radius-full);
+    background-color: var(--color-primary-600);
+    border: 2px solid #FFFFFF;
+    box-shadow: var(--shadow-md);
+}
+
+/* Hazard Markers */
+.map-marker-hazard {
+    filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.1));
+}
+
+.map-marker-hazard__container {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--border-radius-full);
+    background-color: #FFFFFF;
+    border: 3px solid currentColor;
+    transition: transform var(--duration-fast) var(--ease-out);
+}
+
+.map-marker-hazard:hover .map-marker-hazard__container {
+    transform: scale(1.2);
+}
+
+.map-marker-hazard__icon {
+    width: 16px;
+    height: 16px;
+    color: currentColor;
+}
+
+.map-marker-hazard__icon svg {
+    width: 100%;
+    height: 100%;
+}
+
+/* Severity colors */
+.map-marker-hazard--low {
+    color: var(--color-success-500);
+}
+
+.map-marker-hazard--medium {
+    color: var(--color-warning-500);
+}
+
+.map-marker-hazard--high {
+    color: var(--color-danger-500);
+}
+
+.map-marker-hazard--critical {
+    color: var(--color-danger-700);
+    animation: glowPulse 2s var(--ease-in-out) infinite;
+}
+
+/* Map Popup */
+.map-popup {
+    padding: var(--space-4);
+    min-width: 200px;
+}
+
+.map-popup__title {
+    margin: 0 0 var(--space-2) 0;
+    font-size: var(--font-size-lg);
+    font-weight: var(--font-weight-bold);
+    color: var(--color-text-primary);
+}
+
+.map-popup__details {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    margin-bottom: var(--space-2);
+}
+
+.map-popup__badge {
+    padding: var(--space-1) var(--space-2);
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-bold);
+    text-transform: uppercase;
+    border-radius: var(--border-radius-sm);
+    color: #FFFFFF;
+}
+
+.map-popup__badge--low {
+    background-color: var(--color-success-500);
+}
+
+.map-popup__badge--medium {
+    background-color: var(--color-warning-500);
+}
+
+.map-popup__badge--high {
+    background-color: var(--color-danger-500);
+}
+
+.map-popup__badge--critical {
+    background-color: var(--color-danger-700);
+}
+
+.map-popup__confidence {
+    font-size: var(--font-size-sm);
+    color: var(--color-text-secondary);
+}
+
+.map-popup__time {
+    margin: 0;
+    font-size: var(--font-size-sm);
+    color: var(--color-text-tertiary);
+}
+
+/* Empty State */
+.map-panel__empty {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-8);
+    background-color: var(--color-bg-overlay);
+    backdrop-filter: blur(12px);
+    border-radius: var(--border-radius-xl);
+    z-index: var(--z-dropdown);
+    pointer-events: none;
+}
+
+.map-panel__empty-icon {
+    width: 48px;
+    height: 48px;
+    color: var(--color-neutral-400);
+}
+
+.map-panel__empty-text {
+    margin: 0;
+    color: var(--color-text-inverse);
+    font-weight: var(--font-weight-medium);
+}

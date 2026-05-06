@@ -1,0 +1,20 @@
+# Virtual environment
+.venv/
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Model weights
+*.pt
+
+# VS Code
+.vscode/
+
+# Environment files
+.env
+
+# Logs
+*.log
+# Node modules
+node_modules/

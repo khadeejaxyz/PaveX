@@ -1,0 +1,8 @@
+path: C:/Users/khade/OneDrive/Desktop/PaveX
+
+train: train/images
+val: validate/images
+test: test/images
+
+nc: 2
+names: ['pothole', 'speed_hump']

@@ -1,0 +1,23 @@
+# PaveX – Severity Estimation Configuration
+# backend/app/config/severity_config.yaml
+#
+# Thresholds are expressed as a percentage of the total frame area.
+# Positional weighting upgrades severity when the hazard is in the
+# lower portion of the frame (i.e. closer to the camera / vehicle).
+
+# ── Area-based thresholds ────────────────────────────────────────────────────
+# bbox_pct < low_threshold              → "low"
+# low_threshold  ≤ bbox_pct < medium_threshold → "medium"
+# bbox_pct ≥ medium_threshold           → "high"
+
+low_threshold: 5       # percent of frame area
+medium_threshold: 15   # percent of frame area
+
+# ── Positional weighting ─────────────────────────────────────────────────────
+# When enabled, a detection whose bottom edge (y2) falls below
+# `lower_frame_ratio` × frame_height is considered close to the vehicle
+# and its severity is upgraded by one level (low→medium, medium→high).
+
+position_weighting:
+  enabled: true
+  lower_frame_ratio: 0.7   # 0.0 – 1.0  (0.7 = bottom 30 % of frame)

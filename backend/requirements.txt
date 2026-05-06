@@ -1,0 +1,12 @@
+fastapi
+uvicorn
+websockets
+python-multipart
+opencv-python
+numpy
+ultralytics
+torch
+sqlalchemy
+psycopg2-binary
+geoalchemy2
+python-dotenv

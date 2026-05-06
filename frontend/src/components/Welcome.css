@@ -1,0 +1,530 @@
+/**
+ * Welcome / Landing Page Styles
+ */
+
+.welcome {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background-color: var(--color-primary-900);
+    color: var(--color-text-inverse);
+    position: relative;
+    overflow: hidden;
+}
+
+/* ── Ambient orbs ──────────────────────────────────────────────── */
+.welcome__orb {
+    position: absolute;
+    border-radius: var(--border-radius-full);
+    filter: blur(80px);
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 1.2s var(--ease-out);
+}
+
+.welcome--ready .welcome__orb {
+    opacity: 1;
+}
+
+.welcome__orb--1 {
+    width: 600px;
+    height: 600px;
+    top: -200px;
+    left: -150px;
+    background: radial-gradient(circle, rgba(59, 89, 152, 0.45) 0%, transparent 70%);
+    animation: bounce 8s var(--ease-in-out) infinite;
+}
+
+.welcome__orb--2 {
+    width: 500px;
+    height: 500px;
+    top: 100px;
+    right: -100px;
+    background: radial-gradient(circle, rgba(255, 107, 77, 0.25) 0%, transparent 70%);
+    animation: bounce 10s var(--ease-in-out) infinite 2s;
+}
+
+.welcome__orb--3 {
+    width: 400px;
+    height: 400px;
+    bottom: -100px;
+    left: 40%;
+    background: radial-gradient(circle, rgba(34, 197, 94, 0.2) 0%, transparent 70%);
+    animation: bounce 12s var(--ease-in-out) infinite 4s;
+}
+
+/* ── Nav ──────────────────────────────────────────────────────── */
+.welcome__nav {
+    position: relative;
+    z-index: var(--z-sticky);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--space-5) var(--space-10);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(12px);
+    animation: slideDown var(--duration-normal) var(--ease-out);
+}
+
+.welcome__brand {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+}
+
+.welcome__brand-icon {
+    width: 36px;
+    height: 36px;
+}
+
+.welcome__brand-name {
+    font-family: var(--font-display);
+    font-size: var(--font-size-2xl);
+    font-weight: var(--font-weight-black);
+    color: #FFFFFF;
+    letter-spacing: var(--letter-spacing-tight);
+}
+
+.welcome__links {
+    display: flex;
+    align-items: center;
+    gap: var(--space-6);
+}
+
+.welcome__link {
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
+    color: rgba(255, 255, 255, 0.7);
+    text-decoration: none;
+    transition: color var(--duration-fast) var(--ease-out);
+}
+
+.welcome__link:hover {
+    color: #FFFFFF;
+}
+
+/* ── Buttons ──────────────────────────────────────────────────── */
+.welcome__btn {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-3) var(--space-6);
+    font-size: var(--font-size-base);
+    font-weight: var(--font-weight-semibold);
+    border: none;
+    border-radius: var(--border-radius-lg);
+    cursor: pointer;
+    min-height: 44px;
+    transition: all var(--duration-fast) var(--ease-spring);
+}
+
+.welcome__btn:hover {
+    transform: translateY(-2px);
+}
+
+.welcome__btn:active {
+    transform: scale(0.97);
+}
+
+.welcome__btn svg {
+    width: 18px;
+    height: 18px;
+}
+
+.welcome__btn--primary {
+    background: linear-gradient(135deg, var(--color-primary-500), var(--color-primary-700));
+    color: #FFFFFF;
+    box-shadow: 0 4px 20px rgba(59, 89, 152, 0.4);
+}
+
+.welcome__btn--primary:hover {
+    box-shadow: 0 8px 28px rgba(59, 89, 152, 0.55);
+}
+
+.welcome__btn--secondary {
+    background-color: rgba(255, 255, 255, 0.1);
+    color: #FFFFFF;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.welcome__btn--secondary:hover {
+    background-color: rgba(255, 255, 255, 0.18);
+}
+
+.welcome__btn--outline {
+    background: transparent;
+    color: #FFFFFF;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    padding: var(--space-2) var(--space-5);
+    font-size: var(--font-size-sm);
+}
+
+.welcome__btn--outline:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* ── Hero ─────────────────────────────────────────────────────── */
+.welcome__hero {
+    position: relative;
+    z-index: 1;
+    flex: 1;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-16);
+    align-items: center;
+    padding: var(--space-20) var(--space-10);
+    max-width: 1280px;
+    margin: 0 auto;
+    width: 100%;
+}
+
+.welcome__hero-content {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-6);
+}
+
+.welcome__badge {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-2) var(--space-4);
+    background-color: rgba(34, 197, 94, 0.15);
+    border: 1px solid rgba(34, 197, 94, 0.3);
+    border-radius: var(--border-radius-full);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-success-400);
+    width: fit-content;
+    animation: slideUpBlur var(--duration-slower) var(--ease-out);
+}
+
+.welcome__badge-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: var(--border-radius-full);
+    background-color: var(--color-success-500);
+    animation: pulse 2s var(--ease-in-out) infinite;
+}
+
+.welcome__headline {
+    font-size: var(--font-size-6xl);
+    font-weight: var(--font-weight-black);
+    line-height: var(--line-height-tight);
+    letter-spacing: var(--letter-spacing-tight);
+    color: #FFFFFF;
+    margin: 0;
+}
+
+.welcome__word {
+    display: inline-block;
+    animation: slideUpBlur 0.7s var(--ease-out) both;
+}
+
+.welcome__word:nth-child(1) {
+    animation-delay: 0.1s;
+}
+
+.welcome__word:nth-child(2) {
+    animation-delay: 0.18s;
+}
+
+.welcome__word:nth-child(3) {
+    animation-delay: 0.26s;
+}
+
+.welcome__word:nth-child(4) {
+    animation-delay: 0.34s;
+}
+
+.welcome__word--accent {
+    background: linear-gradient(135deg, var(--color-accent-400), var(--color-warning-400));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.welcome__description {
+    margin: 0;
+    font-size: var(--font-size-lg);
+    line-height: var(--line-height-relaxed);
+    color: rgba(255, 255, 255, 0.7);
+    animation: slideUpBlur var(--duration-slower) var(--ease-out) 0.4s both;
+}
+
+.welcome__actions {
+    display: flex;
+    gap: var(--space-4);
+    flex-wrap: wrap;
+    animation: slideUpBlur var(--duration-slower) var(--ease-out) 0.5s both;
+}
+
+/* Stats */
+.welcome__stats {
+    display: flex;
+    gap: var(--space-8);
+    padding-top: var(--space-4);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    animation: slideUpBlur var(--duration-slower) var(--ease-out) 0.6s both;
+}
+
+.welcome__stat {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+}
+
+.welcome__stat-value {
+    font-size: var(--font-size-2xl);
+    font-weight: var(--font-weight-black);
+    font-family: var(--font-mono);
+    color: #FFFFFF;
+}
+
+.welcome__stat-label {
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-medium);
+    color: rgba(255, 255, 255, 0.5);
+    text-transform: uppercase;
+    letter-spacing: var(--letter-spacing-wide);
+}
+
+/* ── Screen mock ──────────────────────────────────────────────── */
+.welcome__illustration {
+    display: flex;
+    justify-content: center;
+    animation: slideUpBlur var(--duration-slower) var(--ease-out) 0.3s both;
+}
+
+.welcome__screen-mock {
+    width: 100%;
+    max-width: 500px;
+    background-color: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: var(--border-radius-xl);
+    overflow: hidden;
+    box-shadow: 0 30px 80px rgba(0, 0, 0, 0.5);
+}
+
+.welcome__screen-bar {
+    display: flex;
+    gap: var(--space-2);
+    padding: var(--space-3) var(--space-4);
+    background-color: rgba(0, 0, 0, 0.3);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.welcome__screen-bar span {
+    width: 10px;
+    height: 10px;
+    border-radius: var(--border-radius-full);
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+.welcome__screen-body {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: var(--space-3);
+    padding: var(--space-4);
+    min-height: 280px;
+}
+
+.welcome__mock-feed {
+    background-color: rgba(0, 0, 0, 0.4);
+    border-radius: var(--border-radius-lg);
+    position: relative;
+    overflow: hidden;
+}
+
+.welcome__mock-bbox {
+    position: absolute;
+    border: 2px solid transparent;
+    border-radius: 4px;
+    animation: pulse 3s var(--ease-in-out) infinite;
+}
+
+.welcome__mock-bbox--high {
+    top: 30%;
+    left: 20%;
+    width: 35%;
+    height: 28%;
+    border-color: var(--color-danger-500);
+    box-shadow: 0 0 12px rgba(239, 68, 68, 0.4);
+}
+
+.welcome__mock-bbox--medium {
+    bottom: 20%;
+    right: 15%;
+    width: 28%;
+    height: 22%;
+    border-color: var(--color-warning-500);
+    box-shadow: 0 0 12px rgba(245, 158, 11, 0.4);
+    animation-delay: 0.8s;
+}
+
+.welcome__mock-sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    padding: var(--space-2);
+}
+
+.welcome__mock-line {
+    height: 8px;
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: var(--border-radius-sm);
+}
+
+.welcome__mock-line--short {
+    width: 70%;
+}
+
+.welcome__mock-badge {
+    height: 24px;
+    border-radius: var(--border-radius-sm);
+}
+
+.welcome__mock-badge--danger {
+    background-color: rgba(239, 68, 68, 0.4);
+}
+
+.welcome__mock-badge--warn {
+    background-color: rgba(245, 158, 11, 0.4);
+}
+
+/* ── Feature cards ────────────────────────────────────────────── */
+.welcome__features {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--space-4);
+    padding: var(--space-10) var(--space-10);
+    max-width: 1280px;
+    margin: 0 auto;
+    width: 100%;
+}
+
+.welcome__feature-card {
+    background-color: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: var(--border-radius-xl);
+    padding: var(--space-6);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    animation: slideUpBlur var(--duration-slower) var(--ease-out) both;
+    transition: all var(--duration-normal) var(--ease-out);
+}
+
+.welcome__feature-card:hover {
+    background-color: rgba(255, 255, 255, 0.08);
+    transform: translateY(-4px);
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.3);
+}
+
+.welcome__feature-icon {
+    font-size: 2rem;
+    width: 52px;
+    height: 52px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(59, 89, 152, 0.25);
+    border-radius: var(--border-radius-lg);
+}
+
+.welcome__feature-title {
+    margin: 0;
+    font-size: var(--font-size-xl);
+    font-weight: var(--font-weight-bold);
+    color: #FFFFFF;
+}
+
+.welcome__feature-body {
+    margin: 0;
+    font-size: var(--font-size-sm);
+    line-height: var(--line-height-relaxed);
+    color: rgba(255, 255, 255, 0.6);
+}
+
+/* ── Footer ───────────────────────────────────────────────────── */
+.welcome__footer {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    padding: var(--space-6);
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    color: rgba(255, 255, 255, 0.4);
+    font-size: var(--font-size-sm);
+}
+
+.welcome__footer p {
+    margin: 0;
+}
+
+/* ── Responsive ──────────────────────────────────────────────── */
+@media (max-width: 1280px) {
+    .welcome__features {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 1024px) {
+    .welcome__hero {
+        grid-template-columns: 1fr;
+        gap: var(--space-10);
+        padding: var(--space-12) var(--space-8);
+    }
+
+    .welcome__illustration {
+        display: none;
+    }
+
+    .welcome__headline {
+        font-size: var(--font-size-5xl);
+    }
+}
+
+@media (max-width: 768px) {
+    .welcome__nav {
+        padding: var(--space-4) var(--space-5);
+    }
+
+    .welcome__links a {
+        display: none;
+    }
+
+    .welcome__hero {
+        padding: var(--space-8) var(--space-5);
+    }
+
+    .welcome__headline {
+        font-size: var(--font-size-4xl);
+    }
+
+    .welcome__stats {
+        flex-wrap: wrap;
+        gap: var(--space-5);
+    }
+
+    .welcome__features {
+        grid-template-columns: 1fr;
+        padding: var(--space-6) var(--space-5);
+    }
+}
+
+@media (max-width: 480px) {
+    .welcome__headline {
+        font-size: var(--font-size-3xl);
+    }
+
+    .welcome__actions {
+        flex-direction: column;
+    }
+
+    .welcome__btn {
+        width: 100%;
+        justify-content: center;
+    }
+}

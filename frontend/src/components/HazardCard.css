@@ -1,0 +1,204 @@
+/**
+ * HazardCard Component Styles
+ */
+
+.hazard-card {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    padding: var(--space-4);
+    background-color: var(--color-bg-primary);
+    border: 2px solid var(--color-border-default);
+    border-left-width: 4px;
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--shadow-sm);
+    transition: all var(--duration-normal) var(--ease-out);
+    cursor: pointer;
+}
+
+.hazard-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.hazard-card[role="button"]:focus-visible {
+    outline: 2px solid var(--color-primary-500);
+    outline-offset: 2px;
+}
+
+/* Severity variants */
+.hazard-card--low {
+    border-left-color: var(--color-success-500);
+}
+
+.hazard-card--medium {
+    border-left-color: var(--color-warning-500);
+}
+
+.hazard-card--high {
+    border-left-color: var(--color-danger-500);
+}
+
+.hazard-card--critical {
+    border-left-color: var(--color-danger-700);
+    background-color: var(--color-danger-50);
+}
+
+/* Header */
+.hazard-card__header {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-3);
+}
+
+.hazard-card__icon {
+    flex-shrink: 0;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--color-neutral-100);
+    border-radius: var(--border-radius-md);
+    color: var(--color-text-secondary);
+}
+
+.hazard-card--low .hazard-card__icon {
+    background-color: var(--color-success-100);
+    color: var(--color-success-700);
+}
+
+.hazard-card--medium .hazard-card__icon {
+    background-color: var(--color-warning-100);
+    color: var(--color-warning-700);
+}
+
+.hazard-card--high .hazard-card__icon,
+.hazard-card--critical .hazard-card__icon {
+    background-color: var(--color-danger-100);
+    color: var(--color-danger-700);
+}
+
+.hazard-card__icon svg {
+    width: 20px;
+    height: 20px;
+}
+
+.hazard-card__title-section {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-2);
+}
+
+.hazard-card__title {
+    margin: 0;
+    font-size: var(--font-size-base);
+    font-weight: var(--font-weight-bold);
+    color: var(--color-text-primary);
+}
+
+.hazard-card__badge {
+    flex-shrink: 0;
+    padding: var(--space-1) var(--space-2);
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-bold);
+    text-transform: uppercase;
+    border-radius: var(--border-radius-sm);
+    color: #FFFFFF;
+}
+
+.hazard-card__badge--low {
+    background-color: var(--color-success-500);
+}
+
+.hazard-card__badge--medium {
+    background-color: var(--color-warning-500);
+}
+
+.hazard-card__badge--high {
+    background-color: var(--color-danger-500);
+}
+
+.hazard-card__badge--critical {
+    background-color: var(--color-danger-700);
+}
+
+/* Details */
+.hazard-card__details {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+}
+
+.hazard-card__detail {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+}
+
+.hazard-card__detail-label {
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-medium);
+    color: var(--color-text-tertiary);
+    text-transform: uppercase;
+    letter-spacing: var(--letter-spacing-wide);
+    min-width: 80px;
+}
+
+.hazard-card__detail-value {
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-semibold);
+    font-family: var(--font-mono);
+    color: var(--color-text-primary);
+}
+
+.hazard-card__confidence-bar {
+    flex: 1;
+    height: 6px;
+    background-color: var(--color-neutral-200);
+    border-radius: var(--border-radius-full);
+    overflow: hidden;
+}
+
+.hazard-card__confidence-fill {
+    height: 100%;
+    background: linear-gradient(90deg,
+            var(--color-success-500),
+            var(--color-warning-500),
+            var(--color-danger-500));
+    border-radius: var(--border-radius-full);
+    transition: width var(--duration-normal) var(--ease-out);
+}
+
+/* Verified badge */
+.hazard-card__verified {
+    display: flex;
+    align-items: center;
+    gap: var(--space-1);
+    padding: var(--space-1) var(--space-2);
+    background-color: var(--color-success-100);
+    border-radius: var(--border-radius-sm);
+    color: var(--color-success-700);
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-semibold);
+    width: fit-content;
+}
+
+.hazard-card__verified svg {
+    width: 14px;
+    height: 14px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .hazard-card {
+        padding: var(--space-3);
+    }
+
+    .hazard-card__detail-label {
+        min-width: 70px;
+        font-size: 10px;
+    }
+}

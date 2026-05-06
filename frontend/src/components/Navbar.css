@@ -1,0 +1,181 @@
+/**
+ * Navbar Styles
+ */
+
+.navbar {
+    position: sticky;
+    top: 0;
+    z-index: var(--z-sticky);
+    display: flex;
+    align-items: center;
+    gap: var(--space-6);
+    padding: 0 var(--space-6);
+    height: 60px;
+    background-color: var(--color-bg-primary);
+    border-bottom: 1px solid var(--color-border-default);
+    box-shadow: var(--shadow-sm);
+    animation: slideDown var(--duration-normal) var(--ease-out);
+}
+
+/* Brand */
+.navbar__brand {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    text-decoration: none;
+    flex-shrink: 0;
+}
+
+.navbar__brand-icon {
+    width: 32px;
+    height: 32px;
+}
+
+.navbar__brand-name {
+    font-family: var(--font-display);
+    font-size: var(--font-size-xl);
+    font-weight: var(--font-weight-black);
+    color: var(--color-text-primary);
+    letter-spacing: var(--letter-spacing-tight);
+}
+
+/* Nav links */
+.navbar__links {
+    display: flex;
+    align-items: center;
+    gap: var(--space-1);
+    flex: 1;
+}
+
+.navbar__link {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-2) var(--space-4);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
+    color: var(--color-text-secondary);
+    text-decoration: none;
+    border-radius: var(--border-radius-md);
+    min-height: 44px;
+    transition: all var(--duration-fast) var(--ease-out);
+}
+
+.navbar__link:hover {
+    color: var(--color-text-primary);
+    background-color: var(--color-neutral-100);
+}
+
+.navbar__link--active {
+    color: var(--color-primary-700);
+    background-color: var(--color-primary-100);
+    font-weight: var(--font-weight-semibold);
+}
+
+.navbar__link-icon {
+    font-size: 1rem;
+}
+
+.navbar__link-label {
+    white-space: nowrap;
+}
+
+/* Right side */
+.navbar__right {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    margin-left: auto;
+}
+
+/* WS badge */
+.navbar__ws-badge {
+    display: flex;
+    align-items: center;
+    gap: var(--space-1);
+    padding: var(--space-1) var(--space-3);
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-neutral-500);
+    background-color: var(--color-neutral-100);
+    border-radius: var(--border-radius-full);
+}
+
+.navbar__ws-badge--ok {
+    color: var(--color-success-700);
+    background-color: var(--color-success-100);
+}
+
+.navbar__ws-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: var(--border-radius-full);
+    background-color: currentColor;
+    animation: pulse 2s var(--ease-in-out) infinite;
+}
+
+/* Bell */
+.navbar__bell {
+    position: relative;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-text-secondary);
+    cursor: pointer;
+    border-radius: var(--border-radius-md);
+    transition: all var(--duration-fast) var(--ease-out);
+}
+
+.navbar__bell:hover {
+    background-color: var(--color-neutral-100);
+    color: var(--color-text-primary);
+}
+
+.navbar__bell svg {
+    width: 22px;
+    height: 22px;
+}
+
+.navbar__bell-count {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    min-width: 16px;
+    height: 16px;
+    padding: 0 4px;
+    font-size: 10px;
+    font-weight: var(--font-weight-bold);
+    color: #FFFFFF;
+    background-color: var(--color-accent-500);
+    border-radius: var(--border-radius-full);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: scaleIn var(--duration-fast) var(--ease-spring);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .navbar {
+        padding: 0 var(--space-4);
+        gap: var(--space-3);
+    }
+
+    .navbar__brand-name {
+        display: none;
+    }
+
+    .navbar__link-label {
+        display: none;
+    }
+
+    .navbar__link {
+        padding: var(--space-2);
+    }
+
+    .navbar__ws-badge span:last-child {
+        display: none;
+    }
+}
