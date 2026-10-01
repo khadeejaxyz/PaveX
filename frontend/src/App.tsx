@@ -13,6 +13,7 @@ import Welcome from './components/Welcome';
 import Dashboard from './components/Dashboard';
 import Analytics from './components/Analytics';
 import Settings from './components/Settings';
+import CriticalAlertBanner from './components/CriticalAlertBanner';
 
 import './App.css';
 
@@ -43,6 +44,7 @@ export default function App() {
     return (
         <BrowserRouter>
             <GlobalInit />
+            <CriticalAlertBanner />
             <Routes>
                 <Route path="/" element={<Welcome />} />
                 <Route path="/dashboard" element={<AppLayout><Dashboard /></AppLayout>} />

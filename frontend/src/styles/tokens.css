@@ -9,15 +9,15 @@
      ============================================ */
 
     /* Primary Brand Colors */
-    --color-primary-900: #0A1628;
-    --color-primary-800: #142540;
-    --color-primary-700: #1E3558;
-    --color-primary-600: #2A4571;
-    --color-primary-500: #3B5998;
-    --color-primary-400: #5B7AB8;
-    --color-primary-300: #8FA9D3;
-    --color-primary-200: #C4D4EB;
-    --color-primary-100: #E8EFF8;
+    --color-primary-900: #102023;
+    --color-primary-800: #173236;
+    --color-primary-700: #1E4A4E;
+    --color-primary-600: #25696B;
+    --color-primary-500: #2E8A86;
+    --color-primary-400: #54B8A9;
+    --color-primary-300: #91D7CA;
+    --color-primary-200: #C7ECE4;
+    --color-primary-100: #E8F7F3;
 
     /* Accent - Alert/Action Color */
     --color-accent-900: #B81E00;
@@ -77,8 +77,8 @@
 
     /* Semantic Colors */
     --color-bg-primary: #FFFFFF;
-    --color-bg-secondary: var(--color-neutral-50);
-    --color-bg-tertiary: var(--color-neutral-100);
+    --color-bg-secondary: #F4F1E8;
+    --color-bg-tertiary: #EBF4EF;
     --color-bg-dark: var(--color-primary-900);
     --color-bg-overlay: rgba(15, 23, 42, 0.85);
 
@@ -97,8 +97,8 @@
      ============================================ */
 
     /* Font Families */
-    --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    --font-display: 'Space Grotesk', var(--font-sans);
+    --font-sans: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --font-display: 'Sora', var(--font-sans);
     --font-mono: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
 
     /* Font Weights */
@@ -136,7 +136,7 @@
     --line-height-relaxed: 1.75;
 
     /* Letter Spacing */
-    --letter-spacing-tight: -0.02em;
+    --letter-spacing-tight: 0;
     --letter-spacing-normal: 0;
     --letter-spacing-wide: 0.02em;
 

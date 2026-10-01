@@ -32,6 +32,10 @@ function transformHazardEvent(hazard: any): HazardEvent {
         detectedAt: hazard.captured_at ?? hazard.detectedAt ?? new Date().toISOString(),
         verified: hazard.verified ?? false,
         reportCount: hazard.report_count ?? hazard.reportCount ?? 1,
+        roadName: hazard.road_name ?? hazard.roadName,
+        roadSegmentId: hazard.road_segment_id ?? hazard.roadSegmentId,
+        direction: hazard.direction,
+        recommendedSpeedKmph: hazard.recommended_speed_kmph ?? hazard.recommendedSpeedKmph ?? hazard.speed_recommendation,
         metadata: hazard.metadata ?? {},
     };
 }
@@ -104,7 +108,7 @@ class APIService {
                     : [0, 0, 0, 0],
                 severity: det.severity,
                 timestamp: det.timestamp || det.location_timestamp || new Date().toISOString(),
-                location: det.latitude && det.longitude
+                location: det.latitude !== undefined && det.longitude !== undefined
                     ? { latitude: det.latitude, longitude: det.longitude }
                     : location,
             }));
@@ -162,6 +166,26 @@ class APIService {
             return hazards.map(transformHazardEvent);
         } catch (error) {
             console.error('Error fetching nearby hazards:', error);
+            return [];
+        }
+    }
+
+    /**
+     * Get all hazards
+     */
+    async getAllHazards(): Promise<HazardEvent[]> {
+        try {
+            const response = await fetch(`${this.baseUrl}/hazards`);
+
+            if (!response.ok) {
+                throw new Error(`Failed to fetch all hazards: ${response.statusText}`);
+            }
+
+            const data: HazardsResponse | any[] = await response.json();
+            const hazards = Array.isArray(data) ? data : (data as HazardsResponse).hazards || [];
+            return hazards.map(transformHazardEvent);
+        } catch (error) {
+            console.error('Error fetching all hazards:', error);
             return [];
         }
     }
@@ -235,6 +259,32 @@ class APIService {
             return savedHazard ? transformHazardEvent(savedHazard) : null;
         } catch (error) {
             console.error('Error reporting hazard:', error);
+            return null;
+        }
+    }
+
+    async updateDriverLocation(location: Location, driverId = 'default-driver'): Promise<any | null> {
+        try {
+            const response = await fetch(`${this.baseUrl}/driver/location`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    driver_id: driverId,
+                    latitude: location.latitude,
+                    longitude: location.longitude,
+                    speed_kmph: location.speedKmph ?? 0,
+                    heading_degrees: location.headingDegrees,
+                    accuracy_meters: location.accuracy,
+                }),
+            });
+
+            if (!response.ok) {
+                throw new Error(`Failed to update driver location: ${response.statusText}`);
+            }
+
+            return response.json();
+        } catch (error) {
+            console.error('Error updating driver location:', error);
             return null;
         }
     }

@@ -1,7 +1,10 @@
 /**
  * PaveX WebSocket Service
  * Handles real-time alerts and system status updates
- * FIXED: Properly handles backend alert format
+ * Features:
+ * - Exponential backoff on reconnect with jitter & capped retry rate
+ * - Heartbeat ping-pong client handling matching backend heartbeat
+ * - Transform backend alert payload to frontend Alert format
  */
 
 import type { Alert, WSMessage } from '../types';
@@ -13,12 +16,13 @@ type ConnectionHandler = (connected: boolean) => void;
 
 class WebSocketService {
     private ws: WebSocket | null = null;
-    private reconnectTimer: NodeJS.Timeout | null = null;
+    private reconnectTimer: ReturnType<typeof setTimeout> | null = null;
     private messageHandlers: Set<MessageHandler> = new Set();
     private connectionHandlers: Set<ConnectionHandler> = new Set();
     private reconnectAttempts = 0;
-    private maxReconnectAttempts = 10;
-    private reconnectDelay = 1000; // Start with 1 second
+    private maxReconnectAttempts = 20;
+    private baseReconnectDelay = 1000; // 1 second
+    private maxReconnectDelay = 30000; // Cap backoff at 30 seconds
     private isIntentionallyClosed = false;
 
     constructor() {
@@ -38,18 +42,30 @@ class WebSocketService {
         this.isIntentionallyClosed = false;
 
         try {
-            this.ws = new WebSocket(`${WS_BASE_URL}/ws/alerts`);
+            this.ws = new WebSocket(`${WS_BASE_URL}/ws/alerts?driver_id=default-driver`);
 
             this.ws.onopen = () => {
                 console.log('WebSocket connected');
                 this.reconnectAttempts = 0;
-                this.reconnectDelay = 1000;
                 this.notifyConnectionHandlers(true);
             };
 
             this.ws.onmessage = (event) => {
                 try {
+                    // Handle raw text heartbeat ping
+                    if (event.data === 'ping') {
+                        this.ws?.send('pong');
+                        return;
+                    }
+
                     const message: WSMessage = JSON.parse(event.data);
+
+                    // Handle server heartbeat ping message
+                    if (message.type === 'ping') {
+                        this.ws?.send('pong');
+                        return;
+                    }
+
                     this.handleMessage(message);
                 } catch (error) {
                     console.error('Failed to parse WebSocket message:', error);
@@ -81,6 +97,7 @@ class WebSocketService {
      */
     disconnect(): void {
         this.isIntentionallyClosed = true;
+        this.reconnectAttempts = 0;
 
         if (this.reconnectTimer) {
             clearTimeout(this.reconnectTimer);
@@ -96,7 +113,7 @@ class WebSocketService {
     }
 
     /**
-     * Schedule reconnection attempt
+     * Schedule reconnection attempt with exponential backoff
      */
     private scheduleReconnect(): void {
         if (this.reconnectTimer) {
@@ -104,14 +121,19 @@ class WebSocketService {
         }
 
         if (this.reconnectAttempts >= this.maxReconnectAttempts) {
-            console.error('Max reconnection attempts reached');
+            console.error(`Max reconnection attempts (${this.maxReconnectAttempts}) reached`);
             return;
         }
 
-        this.reconnectAttempts++;
-        const delay = Math.min(this.reconnectDelay * this.reconnectAttempts, 30000);
+        // Exponential backoff: base * 2^attempts, capped at maxReconnectDelay
+        const expDelay = this.baseReconnectDelay * Math.pow(2, this.reconnectAttempts);
+        const cappedDelay = Math.min(expDelay, this.maxReconnectDelay);
+        // Jitter (±15%) to avoid thundering herd across multiple clients
+        const jitter = cappedDelay * 0.15 * (Math.random() * 2 - 1);
+        const delay = Math.max(this.baseReconnectDelay, Math.round(cappedDelay + jitter));
 
-        console.log(`Reconnecting in ${delay}ms (attempt ${this.reconnectAttempts})`);
+        this.reconnectAttempts++;
+        console.log(`Reconnecting in ${delay}ms (attempt ${this.reconnectAttempts}/${this.maxReconnectAttempts})`);
 
         this.reconnectTimer = setTimeout(() => {
             this.reconnectTimer = null;
@@ -139,6 +161,8 @@ class WebSocketService {
                     longitude: backendAlert.location?.longitude || backendAlert.longitude,
                 },
                 distance: backendAlert.distance,
+                recommendedSpeedKmph: backendAlert.recommended_speed_kmph || backendAlert.recommendedSpeedKmph,
+                warningRadiusMeters: backendAlert.warning_radius_meters || backendAlert.warningRadiusMeters,
                 timestamp: backendAlert.timestamp || message.timestamp || new Date().toISOString(),
                 acknowledged: false,
             };

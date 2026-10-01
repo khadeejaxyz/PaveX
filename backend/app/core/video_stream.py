@@ -28,10 +28,15 @@ logger = logging.getLogger(__name__)
 # ---------------------------------------------------------------------------
 
 # Visual style constants
-_BOX_COLOR      = (0, 255, 0)       # green bounding box
+SEVERITY_COLORS_BGR = {
+    "low": (94, 197, 34),        # green (RGB #22C55E)
+    "medium": (11, 159, 245),    # orange (RGB #F59E0B)
+    "high": (68, 68, 239),       # bright red (RGB #EF4444)
+    "critical": (38, 38, 220),   # crimson/dark red (RGB #DC2626)
+}
+_DEFAULT_BOX_COLOR = (148, 148, 148)  # gray fallback
 _BOX_THICKNESS  = 2
 _TEXT_COLOR     = (255, 255, 255)   # white label text
-_TEXT_BG_COLOR  = (0, 180, 0)       # dark-green label background
 _FPS_COLOR      = (0, 220, 255)     # yellow-ish FPS counter
 _FONT           = cv2.FONT_HERSHEY_SIMPLEX
 _FONT_SCALE     = 0.55
@@ -49,16 +54,25 @@ def _draw_detection(frame, detection: dict) -> None:
     try:
         x1, y1, x2, y2 = (int(v) for v in detection["bbox"])
         cls       = detection.get("class", "unknown")
-        severity  = detection.get("severity", "N/A")
+        severity_raw = detection.get("severity", "N/A")
+        severity  = str(severity_raw).lower()
 
-        # ✅ FIX APPLIED HERE
+        # Decision speed
         decision = detection.get("decision", {})
         rec_speed = decision.get("recommended_speed_kmph", "N/A")
 
-        label     = f"{cls} | {severity} | {rec_speed} km/h"
+        label     = f"{cls} | {str(severity_raw).upper()} | {rec_speed} km/h"
+
+        # Dynamic severity-based color lookup (OpenCV BGR)
+        box_color = SEVERITY_COLORS_BGR.get(severity, _DEFAULT_BOX_COLOR)
+        bg_color  = (
+            int(box_color[0] * 0.7),
+            int(box_color[1] * 0.7),
+            int(box_color[2] * 0.7),
+        )
 
         # --- bounding box ---
-        cv2.rectangle(frame, (x1, y1), (x2, y2), _BOX_COLOR, _BOX_THICKNESS)
+        cv2.rectangle(frame, (x1, y1), (x2, y2), box_color, _BOX_THICKNESS)
 
         # --- label background ---
         (txt_w, txt_h), baseline = cv2.getTextSize(
@@ -70,7 +84,7 @@ def _draw_detection(frame, detection: dict) -> None:
             frame,
             (x1, bg_y1),
             (x1 + txt_w + 2 * _LABEL_PAD, bg_y2),
-            _TEXT_BG_COLOR,
+            bg_color,
             cv2.FILLED,
         )
 
@@ -106,25 +120,7 @@ def _draw_fps(frame, fps: float) -> None:
 # ---------------------------------------------------------------------------
 
 def run_video_stream(source: Union[int, str] = 0) -> None:
-    """
-    Capture video from *source*, run the detection pipeline on every frame,
-    overlay results, and display the output in real time.
 
-    Parameters
-    ----------
-    source : int | str
-        ``0`` (or any integer) selects the corresponding webcam.
-        A string is treated as a file path to a video file.
-
-    Controls
-    --------
-    Press **q** to quit.
-
-    Raises
-    ------
-    RuntimeError
-        If the video source cannot be opened.
-    """
     # ------------------------------------------------------------------
     # Open video source
     # ------------------------------------------------------------------

@@ -128,13 +128,27 @@ function formatHazardType(type: string): string {
 }
 
 /**
+ * FIX: Backend timestamps are UTC. If a timestamp string has no timezone
+ * marker (no trailing 'Z' or +HH:MM offset), `new Date(...)` in the browser
+ * incorrectly assumes it's already LOCAL time — silently shifting it by
+ * the viewer's UTC offset (e.g. ~5.5h for IST). This normalizes any
+ * "bare" ISO timestamp to explicit UTC before parsing.
+ */
+function normalizeTimestamp(timestamp: string): string {
+    if (!timestamp) return timestamp;
+    const hasTimezone = /Z$|[+-]\d{2}:\d{2}$/.test(timestamp);
+    return hasTimezone ? timestamp : `${timestamp}Z`;
+}
+
+/**
  * Format timestamp as time ago
  */
 function formatTimeAgo(timestamp: string): string {
     const now = new Date();
-    const time = new Date(timestamp);
+    const time = new Date(normalizeTimestamp(timestamp));
     const seconds = Math.floor((now.getTime() - time.getTime()) / 1000);
 
+    if (seconds < 0) return 'Just now'; // clock skew guard
     if (seconds < 60) return 'Just now';
     if (seconds < 3600) return `${Math.floor(seconds / 60)}m ago`;
     if (seconds < 86400) return `${Math.floor(seconds / 3600)}h ago`;

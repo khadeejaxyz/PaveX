@@ -19,6 +19,8 @@ export interface Location {
     latitude: number;
     longitude: number;
     accuracy?: number;
+    speedKmph?: number;
+    headingDegrees?: number;
     timestamp?: string;
 }
 
@@ -46,6 +48,10 @@ export interface HazardEvent {
     videoUrl?: string;
     verified: boolean;
     reportCount: number;
+    roadName?: string;
+    roadSegmentId?: string;
+    direction?: string;
+    recommendedSpeedKmph?: number;
     metadata?: Record<string, any>;
 }
 
@@ -57,6 +63,8 @@ export interface Alert {
     message: string;
     location: Location;
     distance?: number; // meters
+    recommendedSpeedKmph?: number;
+    warningRadiusMeters?: number;
     timestamp: string;
     acknowledged: boolean;
 }
@@ -126,9 +134,9 @@ export interface StatsResponse {
 
 // WebSocket Message Types
 export interface WSMessage {
-    type: 'hazard_alert' | 'system_status' | 'detection_update' | 'connection';
-    data: any;
-    timestamp: string;
+    type: 'hazard_alert' | 'system_status' | 'detection_update' | 'connection' | 'ping' | 'pong';
+    data?: any;
+    timestamp?: string;
 }
 
 export interface WSHazardAlert {
@@ -191,6 +199,7 @@ export interface AppActions {
     // Location Actions
     setCurrentLocation: (location: Location) => void;
     setNearbyHazards: (hazards: HazardEvent[]) => void;
+    updateDriverLocation: (location: Location) => Promise<void>;
 
     // System Status Actions
     updateSystemStatus: (status: Partial<SystemStatus>) => void;

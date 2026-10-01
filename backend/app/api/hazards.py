@@ -15,7 +15,7 @@ from sqlalchemy.orm import Session
 
 from app.db.connection import get_db
 from app.db import crud
-from app.db.models import HazardEvent
+from app.db.models import Hazard, HazardStatus, RoadDirection
 
 
 router = APIRouter(
@@ -35,6 +35,10 @@ class HazardCreate(BaseModel):
     longitude: float | None = None
     detected_at: datetime | None = None
     detectedAt: datetime | None = None
+    road_name: str | None = None
+    road_segment_id: str | None = None
+    direction: str | None = None
+    heading_degrees: float | None = None
     metadata: dict | None = None
 
 
@@ -52,18 +56,17 @@ def serialize_hazard(hazard):
     Returns:
         Dictionary with all hazard fields, with UUIDs converted to strings
     """
-    return {
-        "id": str(hazard.id) if hazard.id else None,
-        "hazard_type": enum_value(hazard.hazard_type) if hazard.hazard_type else None,
-        "severity": enum_value(hazard.severity) if hazard.severity else None,
-        "confidence": hazard.confidence,
-        "latitude": hazard.latitude,
-        "longitude": hazard.longitude,
-        "speed_recommendation": hazard.speed_recommendation,
-        "captured_at": hazard.captured_at.isoformat() if hazard.captured_at else None,
-        "description": hazard.description if hasattr(hazard, 'description') else None,
-        "status": hazard.status if hasattr(hazard, 'status') else None,
-    }
+    data = hazard.to_dict()
+
+    # Backward-compatible aliases consumed by the current frontend.
+    data["speed_recommendation"] = hazard.recommended_speed_kmph
+    data["captured_at"] = hazard.last_detected_at.isoformat() if hazard.last_detected_at else None
+    data["detectedAt"] = data["captured_at"]
+    data["hazardType"] = data["hazard_type"]
+    data["report_count"] = hazard.detection_count
+    data["verified"] = enum_value(hazard.status) != "unconfirmed"
+
+    return data
 
 
 def _bbox_area_pct(metadata: dict | None) -> float:
@@ -80,7 +83,19 @@ def _bbox_area_pct(metadata: dict | None) -> float:
 
 
 def _db_severity(severity: str) -> str:
-    return "high" if severity == "critical" else severity
+    return severity if severity in {"low", "medium", "high", "critical"} else "low"
+
+
+def _safe_hazard_type(hazard_type: str) -> str:
+    normalized = (hazard_type or "").strip().lower().replace(" ", "_")
+    return normalized if normalized in {"pothole", "speed_hump", "crack", "debris", "other"} else "other"
+
+
+def _safe_direction(direction: str) -> RoadDirection:
+    try:
+        return RoadDirection(direction)
+    except ValueError:
+        return RoadDirection.UNKNOWN
 
 
 @router.get("")
@@ -107,23 +122,29 @@ def create_hazard(
     if not hazard_type:
         raise HTTPException(status_code=400, detail="hazard_type is required")
 
-    captured_at = payload.detected_at or payload.detectedAt or datetime.now(timezone.utc)
+    detected_at = payload.detected_at or payload.detectedAt or datetime.now(timezone.utc)
+    metadata = payload.metadata or {}
 
-    hazard = crud.create_hazard(
+    hazard = crud.create_or_confirm_hazard(
         db=db,
-        hazard_type=hazard_type,
+        hazard_type=_safe_hazard_type(hazard_type),
         severity=_db_severity(payload.severity),
         confidence=payload.confidence,
-        bbox_area_pct=_bbox_area_pct(payload.metadata),
         latitude=payload.latitude if payload.latitude is not None else 12.9716,
         longitude=payload.longitude if payload.longitude is not None else 77.5946,
-        speed_recommendation=30,
-        video_source="frontend",
-        captured_at=captured_at,
+        recommended_speed_kmph=metadata.get("recommended_speed_kmph") or metadata.get("speed_recommendation") or 30,
+        risk_level=metadata.get("risk_level"),
+        road_name=payload.road_name,
+        road_segment_id=payload.road_segment_id,
+        direction=payload.direction,
+        heading_degrees=payload.heading_degrees,
+        metadata={
+            **metadata,
+            "bbox_area_pct": _bbox_area_pct(metadata),
+            "source": "frontend",
+            "detected_at": detected_at.isoformat(),
+        },
     )
-
-    if hazard is None:
-        return {"duplicate": True, "hazard": None}
 
     return {"hazard": serialize_hazard(hazard)}
 
@@ -153,7 +174,7 @@ def get_hazard(
     hazard_id: UUID,
     db: Session = Depends(get_db),
 ):
-    hazard = db.get(HazardEvent, hazard_id)
+    hazard = db.get(Hazard, hazard_id)
     if hazard is None:
         raise HTTPException(status_code=404, detail="Hazard not found")
     return {"hazard": serialize_hazard(hazard)}
@@ -165,21 +186,44 @@ def update_hazard(
     payload: dict,
     db: Session = Depends(get_db),
 ):
-    hazard = db.get(HazardEvent, hazard_id)
+    hazard = db.get(Hazard, hazard_id)
     if hazard is None:
         raise HTTPException(status_code=404, detail="Hazard not found")
 
     allowed_fields = {
         "hazard_type",
+        "hazardType",
         "severity",
         "confidence",
         "latitude",
         "longitude",
+        "recommended_speed_kmph",
         "speed_recommendation",
+        "risk_level",
+        "road_name",
+        "road_segment_id",
+        "direction",
+        "status",
     }
     for key, value in payload.items():
-        if key in allowed_fields:
-            setattr(hazard, key, value)
+        if key not in allowed_fields:
+            continue
+
+        if key == "hazardType":
+            key = "hazard_type"
+        elif key == "speed_recommendation":
+            key = "recommended_speed_kmph"
+
+        if key == "hazard_type":
+            value = _safe_hazard_type(value)
+        elif key == "severity":
+            value = _db_severity(value)
+        elif key == "status":
+            value = HazardStatus(value)
+        elif key == "direction":
+            value = _safe_direction(value)
+
+        setattr(hazard, key, value)
 
     db.commit()
     db.refresh(hazard)
@@ -191,7 +235,7 @@ def delete_hazard(
     hazard_id: UUID,
     db: Session = Depends(get_db),
 ):
-    hazard = db.get(HazardEvent, hazard_id)
+    hazard = db.get(Hazard, hazard_id)
     if hazard is None:
         raise HTTPException(status_code=404, detail="Hazard not found")
 
@@ -224,7 +268,7 @@ def get_statistics(db: Session) -> dict:
     for hazard in hazards:
         severity = enum_value(hazard.severity)
         hazard_type = enum_value(hazard.hazard_type)
-        captured_at = hazard.captured_at
+        captured_at = hazard.last_detected_at
 
         if severity in severity_distribution:
             severity_distribution[severity] += 1

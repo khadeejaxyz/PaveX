@@ -1,174 +1,160 @@
 /**
  * Welcome / Landing Page
- * PaveX brand splash — Stitch screen #1
  */
 
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './Welcome.css';
 
+const proofPoints = [
+    { value: '<200ms', label: 'hazard signal' },
+    { value: '15+ FPS', label: 'live inference' },
+    { value: '4 levels', label: 'severity routing' },
+];
+
+const features = [
+    {
+        title: 'Detect once',
+        body: 'Camera, video, and uploaded images surface potholes, humps, cracks, and debris while the driver keeps moving.',
+    },
+    {
+        title: 'Deduplicate',
+        body: 'Repeated sightings fold into one road object with confidence, location, and report count preserved.',
+    },
+    {
+        title: 'Warn approaching drivers',
+        body: 'Live alerts translate detections into distance-aware guidance and safer speed recommendations.',
+    },
+    {
+        title: 'Measure the network',
+        body: 'Operators can review severity mix, detection volume, confidence, and history from the analytics route.',
+    },
+];
+
 export default function Welcome() {
     const navigate = useNavigate();
     const [ready, setReady] = useState(false);
 
     useEffect(() => {
-        // Small delay so all fonts / assets settle before animating
         const t = setTimeout(() => setReady(true), 100);
         return () => clearTimeout(t);
     }, []);
 
     return (
         <div className={`welcome ${ready ? 'welcome--ready' : ''}`}>
-            {/* Ambient background orbs */}
-            <div className="welcome__orb welcome__orb--1" />
-            <div className="welcome__orb welcome__orb--2" />
-            <div className="welcome__orb welcome__orb--3" />
-
-            {/* Top nav bar */}
             <header className="welcome__nav">
-                <div className="welcome__brand">
-                    <svg className="welcome__brand-icon" viewBox="0 0 32 32" fill="none">
-                        <rect width="32" height="32" rx="8" fill="var(--color-primary-600)" />
-                        <path
-                            d="M8 22l4-8 4 6 3-4 5 6"
-                            stroke="white"
-                            strokeWidth="2.5"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                        />
-                    </svg>
-                    <span className="welcome__brand-name">PaveX</span>
-                </div>
-                <nav className="welcome__links">
-                    <a href="#features" className="welcome__link">Features</a>
-                    <a href="#about" className="welcome__link">About</a>
-                    <button
-                        className="welcome__btn welcome__btn--outline"
-                        onClick={() => navigate('/dashboard')}
-                    >
-                        Open App
+                <button className="welcome__brand" onClick={() => navigate('/')} type="button">
+                    <BrandMark />
+                    <span>PaveX</span>
+                </button>
+                <nav className="welcome__links" aria-label="Landing navigation">
+                    <a href="#features">Platform</a>
+                    <a href="#signal">Signal Flow</a>
+                    <button className="welcome__ghost-btn" onClick={() => navigate('/analytics')} type="button">
+                        Analytics
                     </button>
                 </nav>
             </header>
 
-            {/* Hero */}
             <main className="welcome__hero">
-                <div className="welcome__hero-content">
-                    <div className="welcome__badge">
-                        <span className="welcome__badge-dot" />
-                        AI-Powered Road Safety
+                <div className="welcome__scene" aria-hidden="true">
+                    <div className="welcome__map-grid" />
+                    <div className="welcome__road welcome__road--main">
+                        <span className="welcome__lane" />
                     </div>
+                    <div className="welcome__road welcome__road--cross" />
+                    <div className="welcome__route welcome__route--one" />
+                    <div className="welcome__route welcome__route--two" />
+                    <div className="welcome__hazard-pin welcome__hazard-pin--critical">
+                        <span />
+                    </div>
+                    <div className="welcome__hazard-pin welcome__hazard-pin--warning">
+                        <span />
+                    </div>
+                    <div className="welcome__driver">
+                        <span />
+                    </div>
+                    <div className="welcome__signal-card welcome__signal-card--alert">
+                        <strong>Critical pothole</strong>
+                        <span>180m ahead - slow to 20 km/h</span>
+                    </div>
+                    <div className="welcome__signal-card welcome__signal-card--feed">
+                        <strong>3 reports merged</strong>
+                        <span>Confidence rising: 91%</span>
+                    </div>
+                </div>
 
-                    <h1 className="welcome__headline">
-                        <span className="welcome__word">Smart</span>{' '}
-                        <span className="welcome__word">Road</span>{' '}
-                        <span className="welcome__word welcome__word--accent">Hazard</span>{' '}
-                        <span className="welcome__word">Detection</span>
-                    </h1>
-
-                    <p className="welcome__description">
-                        PaveX uses real-time YOLOv8 computer vision to detect potholes, speed humps,
-                        and road hazards — providing instant alerts and speed recommendations to keep
-                        drivers safe.
+                <section className="welcome__hero-copy">
+                    <p className="welcome__eyebrow">Road intelligence from one detected hazard</p>
+                    <h1>PaveX</h1>
+                    <p className="welcome__lede">
+                        A polished safety command layer that turns live road-hazard detection into
+                        shared warnings, map context, and speed guidance for drivers and operators.
                     </p>
-
                     <div className="welcome__actions">
-                        <button
-                            className="welcome__btn welcome__btn--primary"
-                            onClick={() => navigate('/dashboard')}
-                        >
-                            <svg viewBox="0 0 24 24" fill="none">
-                                <path d="M5 3l14 9-14 9V3z" fill="currentColor" />
-                            </svg>
-                            Launch Dashboard
+                        <button className="welcome__primary-btn" onClick={() => navigate('/dashboard')} type="button">
+                            <PlayIcon />
+                            Open Dashboard
                         </button>
-                        <button
-                            className="welcome__btn welcome__btn--secondary"
-                            onClick={() => navigate('/analytics')}
-                        >
-                            View Analytics
+                        <button className="welcome__secondary-btn" onClick={() => navigate('/settings')} type="button">
+                            Tune Alerts
                         </button>
                     </div>
-
-                    {/* Quick stats */}
-                    <div className="welcome__stats">
-                        {[
-                            { value: '<200ms', label: 'Detection Latency' },
-                            { value: '>85%', label: 'Accuracy' },
-                            { value: '15+ FPS', label: 'Live Inference' },
-                            { value: '4', label: 'Severity Levels' },
-                        ].map((s) => (
-                            <div key={s.label} className="welcome__stat">
-                                <span className="welcome__stat-value">{s.value}</span>
-                                <span className="welcome__stat-label">{s.label}</span>
+                    <div className="welcome__proof">
+                        {proofPoints.map((point) => (
+                            <div className="welcome__proof-item" key={point.label}>
+                                <strong>{point.value}</strong>
+                                <span>{point.label}</span>
                             </div>
                         ))}
                     </div>
-                </div>
-
-                {/* Illustration panel */}
-                <div className="welcome__illustration">
-                    <div className="welcome__screen-mock">
-                        <div className="welcome__screen-bar">
-                            <span /><span /><span />
-                        </div>
-                        <div className="welcome__screen-body">
-                            <div className="welcome__mock-feed">
-                                <div className="welcome__mock-bbox welcome__mock-bbox--high" />
-                                <div className="welcome__mock-bbox welcome__mock-bbox--medium" />
-                            </div>
-                            <div className="welcome__mock-sidebar">
-                                <div className="welcome__mock-line" />
-                                <div className="welcome__mock-line welcome__mock-line--short" />
-                                <div className="welcome__mock-badge welcome__mock-badge--danger" />
-                                <div className="welcome__mock-line" />
-                                <div className="welcome__mock-line welcome__mock-line--short" />
-                                <div className="welcome__mock-badge welcome__mock-badge--warn" />
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                </section>
             </main>
 
-            {/* Feature Cards */}
             <section id="features" className="welcome__features">
-                {[
-                    {
-                        icon: '🎯',
-                        title: 'Real-Time Detection',
-                        body: 'YOLOv8 model processes live video frames at 15+ FPS to instantly identify potholes, humps, cracks, and debris.',
-                    },
-                    {
-                        icon: '🗺️',
-                        title: 'Geo-Mapped Hazards',
-                        body: 'Every detection is GPS-tagged and plotted on an interactive map so you always know what lies ahead.',
-                    },
-                    {
-                        icon: '🔔',
-                        title: 'Smart Alerts',
-                        body: 'WebSocket-powered alerts with configurable severity thresholds and proximity distance filtering.',
-                    },
-                    {
-                        icon: '📊',
-                        title: 'Analytics Dashboard',
-                        body: 'Charts, detection history, severity trends and confidence scores — all in one unified view.',
-                    },
-                ].map((f, i) => (
-                    <div
-                        key={f.title}
-                        className="welcome__feature-card"
-                        style={{ animationDelay: `${0.1 + i * 0.08}s` }}
+                {features.map((feature, index) => (
+                    <article
+                        className="welcome__feature"
+                        key={feature.title}
+                        style={{ animationDelay: `${index * 0.08}s` }}
                     >
-                        <div className="welcome__feature-icon">{f.icon}</div>
-                        <h3 className="welcome__feature-title">{f.title}</h3>
-                        <p className="welcome__feature-body">{f.body}</p>
-                    </div>
+                        <span className="welcome__feature-step">0{index + 1}</span>
+                        <h2>{feature.title}</h2>
+                        <p>{feature.body}</p>
+                    </article>
                 ))}
             </section>
 
-            <footer className="welcome__footer">
-                <p>© 2026 PaveX — Smart Road Hazard Monitor</p>
-            </footer>
+            <section id="signal" className="welcome__signal">
+                <div>
+                    <p className="welcome__eyebrow">Live driver loop</p>
+                    <h2>Camera to cockpit in one continuous flow.</h2>
+                </div>
+                <div className="welcome__signal-rail" aria-label="PaveX signal flow">
+                    {['Capture', 'Classify', 'Merge', 'Warn', 'Analyze'].map((step) => (
+                        <span key={step}>{step}</span>
+                    ))}
+                </div>
+            </section>
         </div>
+    );
+}
+
+function BrandMark() {
+    return (
+        <svg className="welcome__brand-icon" viewBox="0 0 32 32" fill="none" aria-hidden="true">
+            <rect width="32" height="32" rx="7" fill="#102023" />
+            <path d="M7 22h18" stroke="#F6C453" strokeWidth="2.4" strokeLinecap="round" />
+            <path d="M10 21l4-11 4 11" stroke="#F8FAFC" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" />
+            <path d="M19 13l4 8" stroke="#54B8A9" strokeWidth="2.4" strokeLinecap="round" />
+        </svg>
+    );
+}
+
+function PlayIcon() {
+    return (
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M8 5v14l11-7L8 5z" fill="currentColor" />
+        </svg>
     );
 }

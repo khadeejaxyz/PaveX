@@ -6,6 +6,7 @@
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 import type { AppState, AppActions } from '../types';
+import { api } from '../services/api';
 
 // Initial state
 const initialState: AppState = {
@@ -103,6 +104,11 @@ export const useStore = create<AppState & AppActions>()(
 
                 setNearbyHazards: (hazards) =>
                     set({ nearbyHazards: hazards }),
+
+                updateDriverLocation: async (location) => {
+                    set({ currentLocation: location });
+                    await api.updateDriverLocation(location);
+                },
 
                 // System Status Actions
                 updateSystemStatus: (status) =>

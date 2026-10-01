@@ -7,7 +7,9 @@ import logging
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.api.detect import router as detect_router
+from app.api.driver import router as driver_router
 from app.api.hazards import router as hazards_router, stats_router
+from app.api.auth import router as auth_router
 from app.ws.alerts_ws import router as alerts_ws_router
 from app.db.connection import check_db_health
 
@@ -38,8 +40,10 @@ app.add_middleware(
 
 # Include routers
 app.include_router(detect_router)
+app.include_router(driver_router)
 app.include_router(hazards_router)
 app.include_router(stats_router)
+app.include_router(auth_router)
 app.include_router(alerts_ws_router)
 
 

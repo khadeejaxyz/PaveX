@@ -47,6 +47,11 @@ _DECISION_MAP: dict[str, dict[str, Any]] = {
         "recommended_speed_kmph": 10,
         "risk_level": "high",
     },
+    "critical": {
+        "action": "brake",
+        "recommended_speed_kmph": 5,
+        "risk_level": "critical",
+    },
 }
 
 # Fallback used whenever an unrecognised severity value arrives.

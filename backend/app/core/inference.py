@@ -60,15 +60,6 @@ except Exception as exc:
 # ---------------------------------------------------------------------------
 
 def run_inference(frame: np.ndarray) -> List[dict]:
-    """
-    Run YOLOv8 inference on a single image frame.
-
-    Args:
-        frame (np.ndarray): OpenCV image (H, W, C)
-
-    Returns:
-        List[dict]: Detection results
-    """
 
     if frame is None or frame.size == 0:
         logger.warning("Empty frame received – returning no detections")

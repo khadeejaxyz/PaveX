@@ -13,8 +13,10 @@ import type { Location, Alert, WSMessage } from '../types';
  */
 export function useGeolocation() {
     const setCurrentLocation = useStore((state) => state.setCurrentLocation);
+    const updateDriverLocation = useStore((state) => state.updateDriverLocation);
     const updateSystemStatus = useStore((state) => state.updateSystemStatus);
     const [error, setError] = useState<string | null>(null);
+    const lastSentRef = useRef(0);
 
     useEffect(() => {
         if (!navigator.geolocation) {
@@ -29,9 +31,15 @@ export function useGeolocation() {
                     latitude: position.coords.latitude,
                     longitude: position.coords.longitude,
                     accuracy: position.coords.accuracy,
+                    speedKmph: position.coords.speed ? position.coords.speed * 3.6 : undefined,
+                    headingDegrees: position.coords.heading ?? undefined,
                     timestamp: new Date(position.timestamp).toISOString(),
                 };
                 setCurrentLocation(location);
+                if (Date.now() - lastSentRef.current > 2500) {
+                    lastSentRef.current = Date.now();
+                    updateDriverLocation(location);
+                }
                 updateSystemStatus({ gps: 'available' });
                 setError(null);
             },
@@ -47,7 +55,7 @@ export function useGeolocation() {
         );
 
         return () => navigator.geolocation.clearWatch(watchId);
-    }, [setCurrentLocation, updateSystemStatus]);
+    }, [setCurrentLocation, updateDriverLocation, updateSystemStatus]);
 
     return { error };
 }
@@ -178,8 +186,6 @@ export function useDetection() {
 
                 response.detections.forEach((detection) => {
                     addDetection(detection);
-                    // Save to backend for persistence
-                    api.saveDetection(detection);
                 });
 
                 return response.detections;
@@ -208,7 +214,6 @@ export function useDetection() {
                 const response = await api.detectVideoFrame(blob, currentLocation || undefined);
 
                 setDetections(response.detections);
-                response.detections.forEach((detection) => api.saveDetection(detection));
 
                 return response.detections;
             } catch (error) {

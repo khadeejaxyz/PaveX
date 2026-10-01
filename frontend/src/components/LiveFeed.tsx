@@ -2,6 +2,8 @@
  * LiveFeed Component
  * Displays live camera feed with real-time hazard detection overlays
  * FIXED: Properly renders bbox array format [x1, y1, x2, y2]
+ * FIXED: Overlay now draws from a ref updated synchronously per detection,
+ *        eliminating the stale-frame desync caused by React state lag.
  */
 
 import { useEffect, useRef } from 'react';
@@ -17,6 +19,7 @@ export default function LiveFeed({ onDetection, videoSrc = null, className = '' 
     const animationFrameRef = useRef<number>();
     const lastDetectionTimeRef = useRef(0);
     const detectionInFlightRef = useRef(false);
+    const latestDetectionsRef = useRef<Detection[]>([]);
 
     const { stream, error: streamError } = useMediaStream(undefined, !videoSrc);
     const { detectVideoFrame } = useDetection();
@@ -98,6 +101,7 @@ export default function LiveFeed({ onDetection, videoSrc = null, className = '' 
 
                     try {
                         const detections = await detectVideoFrame(canvas);
+                        latestDetectionsRef.current = detections ?? [];
                         detections?.forEach((detection) => onDetection?.(detection));
                     } finally {
                         detectionInFlightRef.current = false;
@@ -109,10 +113,10 @@ export default function LiveFeed({ onDetection, videoSrc = null, className = '' 
                     }
                 }
 
-                // Draw detection overlays
+                // Draw detection overlays — always reflects the exact frame just analyzed
                 drawDetections(
                     overlayCtx,
-                    currentDetections,
+                    latestDetectionsRef.current,
                     video.videoWidth,
                     video.videoHeight,
                     displayWidth,
@@ -131,7 +135,7 @@ export default function LiveFeed({ onDetection, videoSrc = null, className = '' 
                 cancelAnimationFrame(animationFrameRef.current);
             }
         };
-    }, [currentDetections, detectVideoFrame, recordFrame, inputSource, videoSrc]);
+    }, [detectVideoFrame, recordFrame, inputSource, videoSrc]);
 
     return (
         <div className={`live-feed ${className}`}>

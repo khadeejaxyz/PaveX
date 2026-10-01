@@ -1,0 +1,5 @@
+yolo detect train model=runs/detect/train5/weights/best.pt data=data.yaml epochs=50 device=0
+python -c "from backend.app.core.video_stream import run_video_stream; run_video_stream('test/pothole.mp4')"
+ python -m uvicorn app.main:app --reload
+http://127.0.0.1:8000/docs#/default/health_health_get
+npm.cmd run dev

@@ -17,6 +17,17 @@ L.Icon.Default.mergeOptions({
     shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
 });
 
+/**
+ * FIX: same UTC-timestamp normalization as HazardCard.tsx — backend
+ * timestamps without an explicit 'Z'/offset were being misread as local
+ * time in the popup, showing the wrong detected time.
+ */
+function normalizeTimestamp(timestamp: string): string {
+    if (!timestamp) return timestamp;
+    const hasTimezone = /Z$|[+-]\d{2}:\d{2}$/.test(timestamp);
+    return hasTimezone ? timestamp : `${timestamp}Z`;
+}
+
 export default function MapPanel({
     hazards,
     currentLocation,
@@ -138,7 +149,7 @@ export default function MapPanel({
             </span>
           </div>
           <p class="map-popup__time">
-            ${new Date(hazard.detectedAt).toLocaleString()}
+            ${new Date(normalizeTimestamp(hazard.detectedAt)).toLocaleString()}
           </p>
         </div>
       `);

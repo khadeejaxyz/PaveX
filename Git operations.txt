@@ -1,0 +1,116 @@
+
+
+# NEXT TIME — Work on Your Branch
+
+## 1. Open project
+cd ~/OneDrive/Desktop/PaveX
+```
+
+---
+
+## 2. Switch to your branch
+
+
+git checkout khadeeja-sub
+```
+
+---
+
+## 3. Pull latest branch code
+
+git pull origin khadeeja-sub
+```
+
+---
+
+## 4. After coding, check files
+
+git status
+```
+
+---
+
+## 5. Add files
+
+
+git add .
+```
+
+---
+
+## 6. Commit changes
+
+
+git commit -m "Updated PaveX features"
+```
+
+---
+
+## 7. Push to YOUR branch
+
+
+git push origin khadeeja-sub
+```
+
+---
+
+# IF YOU WANT TO WORK ON MAIN
+
+## 1. Switch to main
+
+
+git checkout main
+```
+
+---
+
+## 2. Pull latest main
+
+
+git pull origin main
+```
+
+---
+
+## 3. Work and push to main
+
+git add .
+git commit -m "Updated main branch"
+git push origin main
+```
+
+---
+
+# IF YOU WANT MAIN UPDATES INSIDE YOUR BRANCH
+
+## 1. Switch to your branch
+
+`
+git checkout khadeeja-sub
+```
+
+---
+
+## 2. Merge main into your branch
+
+
+git merge main
+```
+
+---
+
+## 3. Push updated branch
+
+git push origin khadeeja-sub
+```
+
+---
+
+# Check Current Branch
+
+`
+git branch --show-current
+
+
+git merge khadeeja-sub
+```

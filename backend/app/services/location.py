@@ -8,8 +8,48 @@ import math
 from typing import Dict, Tuple, Optional, Any
 from datetime import datetime
 import logging
+from dataclasses import dataclass
 
 logger = logging.getLogger(__name__)
+
+
+@dataclass
+class StoredDriverLocation:
+    driver_id: str
+    latitude: float
+    longitude: float
+    speed_kmph: float = 0.0
+    heading_degrees: float | None = None
+    accuracy_meters: float | None = None
+    updated_at: str = ""
+
+
+_driver_locations: dict[str, StoredDriverLocation] = {}
+
+
+def store_driver_location(
+    driver_id: str,
+    latitude: float,
+    longitude: float,
+    speed_kmph: float = 0.0,
+    heading_degrees: float | None = None,
+    accuracy_meters: float | None = None,
+) -> StoredDriverLocation:
+    location = StoredDriverLocation(
+        driver_id=driver_id,
+        latitude=latitude,
+        longitude=longitude,
+        speed_kmph=speed_kmph,
+        heading_degrees=heading_degrees,
+        accuracy_meters=accuracy_meters,
+        updated_at=datetime.utcnow().isoformat(),
+    )
+    _driver_locations[driver_id] = location
+    return location
+
+
+def get_driver_location(driver_id: str) -> StoredDriverLocation | None:
+    return _driver_locations.get(driver_id)
 
 
 class LocationService:

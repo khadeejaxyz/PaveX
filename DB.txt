@@ -1,0 +1,3 @@
+s8sXRAUhNiOwTXLy
+DB password supabases
+postgresql://postgres.bjztzzunicqnyyfkrpuf:s8sXRAUhNiOwTXLy@aws-1-ap-southeast-2.pooler.supabase.com:5432/postgres

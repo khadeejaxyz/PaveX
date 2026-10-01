@@ -37,22 +37,58 @@ export default function Dashboard() {
     const [imagePreview, setPreview] = useState<string | null>(null);
     const [videoPreview, setVideoPreview] = useState<string | null>(null);
 
-    // Refresh nearby hazards when location changes
+    // Load all hazards on mount so hazards show before WebSocket delivers anything
     useEffect(() => {
-        if (currentLocation) {
+        api.getAllHazards().then((hazards) => {
+            if (hazards && hazards.length > 0) {
+                setNearbyHazards(hazards);
+            }
+        });
+    }, [setNearbyHazards]);
+
+    // FIX: Keep hazards fresh via polling — MERGE with the existing list
+    // instead of replacing it. getNearbyHazards() is radius-filtered by
+    // currentLocation, so if GPS drifts or a hazard sits just outside the
+    // radius, a flat setNearbyHazards(nearby) would silently delete markers
+    // that were already correctly showing on the map ("hazards show on
+    // refresh but don't persist"). Merging by id means the poll can only
+    // add/update hazards, never remove ones we already know about.
+    useEffect(() => {
+        if (!currentLocation) return;
+
+        const refresh = () => {
             api
                 .getNearbyHazards(currentLocation.latitude, currentLocation.longitude, 1000)
-                .then(setNearbyHazards);
-        }
-    }, [currentLocation, setNearbyHazards]);
+                .then((nearby) => {
+                    useStore.setState((state) => {
+                        const merged = new Map(state.nearbyHazards.map((h) => [h.id, h]));
+                        nearby.forEach((h) => merged.set(h.id, h));
+                        return { nearbyHazards: Array.from(merged.values()) };
+                    });
+                });
+        };
 
-    // Speed recommendation
-    const hasCritical = currentDetections.some(
-        (d) => d.severity === 'critical' || d.severity === 'high'
+        refresh(); // immediate fetch on location lock/change
+        const interval = setInterval(refresh, 5000); // poll every 5s
+
+        return () => clearInterval(interval);
+    }, [currentLocation]);
+
+    // FIX: Speed recommendation now comes from the backend's actual decision
+    // engine (recommendedSpeedKmph on each hazard) instead of a hardcoded
+    // 20/40 guess, and currentSpeed reads real GPS speed instead of a
+    // permanently frozen 45.
+    const hazardsWithSpeed = nearbyHazards.filter(
+        (h) => h.recommendedSpeedKmph !== undefined && h.recommendedSpeedKmph !== null
     );
-    const currentSpeed = 45;
-    const recommendedSpeed = hasCritical ? 20 : 40;
     const maxSafeSpeed = 50;
+    const recommendedSpeed = hazardsWithSpeed.length > 0
+        ? Math.min(...hazardsWithSpeed.map((h) => h.recommendedSpeedKmph as number))
+        : maxSafeSpeed;
+    const hasCritical = nearbyHazards.some(
+        (h) => h.severity === 'critical' || h.severity === 'high'
+    );
+    const currentSpeed = currentLocation?.speedKmph ?? 0;
 
     // File / drag handlers
     async function handleFile(file: File) {
@@ -116,6 +152,22 @@ export default function Dashboard() {
 
     return (
         <div className="dashboard">
+            <header className="dashboard__hero">
+                <div>
+                    <p className="dashboard__eyebrow">Driver Command Center</p>
+                    <h1>Live road intelligence</h1>
+                    <p>
+                        One hazard detection becomes shared location context, alert priority, and
+                        immediate speed guidance.
+                    </p>
+                </div>
+                <div className="dashboard__mission">
+                    <span>Recommended</span>
+                    <strong>{recommendedSpeed} km/h</strong>
+                    <small>{hasCritical ? 'High severity active' : 'Route within safe envelope'}</small>
+                </div>
+            </header>
+
             {/* ── Top status bar ── */}
             <div className="dashboard__statusbar">
                 <StatusChip label="Camera" ok={systemStatus.camera === 'connected'} />
@@ -149,8 +201,8 @@ export default function Dashboard() {
                         onClick={() => handleSourceClick(src)}
                         type="button"
                     >
-                        {src === 'camera' ? '📷' : src === 'video' ? '🎥' : '🖼️'}
-                        {' '}{src.charAt(0).toUpperCase() + src.slice(1)}
+                        <SourceIcon source={src} />
+                        <span>{src.charAt(0).toUpperCase() + src.slice(1)}</span>
                     </button>
                 ))}
 
@@ -279,5 +331,32 @@ function StatusChip({ label, ok }: { label: string; ok: boolean }) {
             <span className="status-chip__dot" />
             {label}
         </div>
+    );
+}
+
+function SourceIcon({ source }: { source: InputSource }) {
+    if (source === 'camera') {
+        return (
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M5 7h3l1.5-2h5L16 7h3a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V9a2 2 0 012-2z" stroke="currentColor" strokeWidth="2" strokeLinejoin="round" />
+                <circle cx="12" cy="13" r="3.5" stroke="currentColor" strokeWidth="2" />
+            </svg>
+        );
+    }
+
+    if (source === 'video') {
+        return (
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M5 7h9a2 2 0 012 2v1.5l4-2.5v8l-4-2.5V15a2 2 0 01-2 2H5a2 2 0 01-2-2V9a2 2 0 012-2z" stroke="currentColor" strokeWidth="2" strokeLinejoin="round" />
+            </svg>
+        );
+    }
+
+    return (
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M5 5h14v14H5z" stroke="currentColor" strokeWidth="2" />
+            <path d="M7 16l3.5-4 3 3 2-2 2.5 3" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+            <circle cx="15.5" cy="8.5" r="1.5" fill="currentColor" />
+        </svg>
     );
 }
